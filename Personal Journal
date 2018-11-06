@@ -1,26 +1,20 @@
-Project Objective: 
-(i)  Testing the partition tolerance of a NoSQL DB.
-(ii) Developing the Data Service API in GO & Deploying the API in AWS.
+# Objectives:
 
-CAP Theorem - States that it is impossible for a distributed data store to simultaneously provide more than two of the following three guarantees:
+In this project, you will be testing the Partition Tolerance of a NoSQL DB using the procedures described in the following article:  https://www.infoq.com/articles/jepsen. In addition, you will be developing a Data Service API in Go and deploying the API on AWS.
 
-CONSISTENCY         -> Every read receives the most recent write or an error.
-AVAILIBILITY        -> Every request receives a response that is not an error.
-PARTITION TOLERANCE -> The system continues to operate despite an arbitrary number of messages being dropped (or delayed) by the network between nodes
+# Requirements:
 
-Latency - Time interval between the stimulation and response, or a time delay between the cause and the effect of some physical change in the system being observed.
+* Select one CP and one AP NoSQL Database. 
+* For example: Mongo and Riak (Note: Other NoSQL DBs that can be configured in CP or AP mode are also allowed).
+* For each Database:
+  - Set up your cluster as AWS EC2 Instances.  (# of Nodes and Topology is open per your design)
+  - Set up the Experiments (i.e. Test Cases), run the Experiments and record the results for both AP and CP.
+* For one of your NoSQL database, develop the Go API and integrate the API with the Team SaaS App from the Hackathon Project.
+* Project must be use in a GitHub Repo (assigned by TA) to maintain source code, documentation and design diagrams.
+* Repo will be maintain in:  https://github.com/nguyensjsu (Links to an external site.)Links to an external site.
+* Keep a Project Journal (as a markdown document) recording weekly progress, challenges, tests and test results.
+* All documentation must be written in GitHub Markdown (including diagrams) and committed to GitHub.
 
-Type of failure where messages are arbitarily delayed or dropped is called network partition.
 
-Testing Partitions:
 
-Need a collection of nodes to test.
- 
--> Use 5 EC2 nodes.
--> the nodes shoould share a network of some kind. (maybe a single virtual bridge interface)
--> name the nodes n1, n2, n3, n4 and n5.
--> set up DNS between them and the host OS.
 
-To cause a partition, need a way to drop or delay messages.
-
-On Linux, can use iptables -A INPUT -s some-peer -j DROP to cause a unidirectional partition. 
