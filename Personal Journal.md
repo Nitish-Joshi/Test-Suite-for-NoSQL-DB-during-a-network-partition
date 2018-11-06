@@ -14,3 +14,16 @@ In this project, you will be testing the Partition Tolerance of a NoSQL DB using
 * Repo will be maintain in:  https://github.com/nguyensjsu (Links to an external site.)Links to an external site.
 * Keep a Project Journal (as a markdown document) recording weekly progress, challenges, tests and test results.
 * All documentation must be written in GitHub Markdown (including diagrams) and committed to GitHub.
+
+# Week 1:
+
+* Objective ---> Initial Research on the basic understanding and functionality of the project, studying the requriements, identifying the key aspects and figuring out the necessary technologies to be used.
+
+# Task 1:
+
+1) Studying NoSQL Databases
+2) Understanding CAP Theorem
+3) Understanding the requirements and architecture of the project through the article - https://www.infoq.com/articles/jepsen
+4) Researching on the NoSQL DB to be used for both CP and AP.
+5) Understanding Partition Tolerance and its pitfalls.
+6) Studying other related terminologies required for the project.
