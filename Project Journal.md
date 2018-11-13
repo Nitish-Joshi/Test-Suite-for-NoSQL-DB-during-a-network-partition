@@ -24,3 +24,18 @@ Objective ---> Initial Research on the basic understanding and functionality of 
 * Researching on the NoSQL DB to be used for both CP and AP.
 * Understanding Partition Tolerance and its pitfalls.
 * Studying other related terminologies required for the project.
+
+**What is CAP Theorem?**  
+ANS: States that it is impossible for a distributed data store to simultaneously provide more than two of the following three guarantees:-
+1. CONSISTENCY - Every read receives the most recent write or an error.
+2. AVAILIBILITY - Every request receives a response that is not an error.
+3. PARTITION TOLERANCE - The system continues to operate despite an arbitrary number of messages being dropped (or delayed) by the network between nodes. 
+
+**What are the requirements of the project that have been understood from the project?**  
+ANS: We are supposed to create a cluster of NoSQL DBS wherein if one of the system is not able to communicate with the rest of the systems due to network failure then also our API should be able to read stale data. Thus showing high availability of our cluster (partition tolerant system).
+
+**What is partition tolerance and its pitfalls?**  
+Ans: Partition tolerance in CAP means tolerance to a network partition. An example of NP is when two nodes cant talk to each other, but there are clients who are able to talk to either one of both of these nodes. An AP system is able to function during the network split, while being able to provide various forms of eventual consistency.
+
+**What are the benefits of using MongoDB (NoSQL) for this project?**  
+Ans: MongoDB is easy to scale. Supports replication and high availability. Use internal memory for storing the working set, enabling faster access of data. Also, with right configuration of replica set, partition tolerance can be tested on MongoDB.
