@@ -17,7 +17,7 @@ In this project, you will be testing the Partition Tolerance of a NoSQL DB using
 # Week 1:
 Objective ---> Initial Research on the basic understanding and functionality of the project, studying the requriements, identifying the key aspects and figuring out the necessary technologies to be used.
 
-# Task 1:
+# Tasks:
 * Studying NoSQL Databases
 * Understanding CAP Theorem
 * Understanding the requirements and architecture of the project through the article - https://www.infoq.com/articles/jepsen
@@ -39,3 +39,16 @@ Ans: Partition tolerance in CAP means tolerance to a network partition. An examp
 
 **What are the benefits of using MongoDB (NoSQL) for this project?**  
 Ans: MongoDB is easy to scale. Supports replication and high availability. Use internal memory for storing the working set, enabling faster access of data. Also, with right configuration of replica set, partition tolerance can be tested on MongoDB.
+
+# Week 2:
+Objective ---> Setup MongoDB cluster and configure the replicaset.
+
+# Tasks:
+* Setup an AMI for EC2 having mongodb installed. Boot up 5 different EC2's with the AMI.
+* Set a common VPC for all the EC2 instances.
+* Mongodb configuration for replicationset.
+
+1) Create Mongodb cluster using EC2 instances:
+2) Install Mongodb in the primary node:
+3) Authentication using a secret key file:
+4) Replicaset configuration in mongod instances:
