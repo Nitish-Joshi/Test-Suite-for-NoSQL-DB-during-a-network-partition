@@ -27,9 +27,9 @@ Objective ---> Initial Research on the basic understanding and functionality of 
 
 **What is CAP Theorem?**  
 ANS: States that it is impossible for a distributed data store to simultaneously provide more than two of the following three guarantees:-
-1. CONSISTENCY - Every read receives the most recent write or an error.
-2. AVAILIBILITY - Every request receives a response that is not an error.
-3. PARTITION TOLERANCE - The system continues to operate despite an arbitrary number of messages being dropped (or delayed) by the network between nodes. 
+1.CONSISTENCY - Every read receives the most recent write or an error.
+2.AVAILIBILITY - Every request receives a response that is not an error.
+3.PARTITION TOLERANCE - The system continues to operate despite an arbitrary number of messages being dropped (or delayed) by the network between nodes. 
 
 **What are the requirements of the project that have been understood from the project?**  
 ANS: We are supposed to create a cluster of NoSQL DBS wherein if one of the system is not able to communicate with the rest of the systems due to network failure then also our API should be able to read stale data. Thus showing high availability of our cluster (partition tolerant system).
@@ -45,7 +45,6 @@ Objective ---> MongoDB cluster setup with replicaset configuration.
 
 ### Task 1 - Configure VPC:
 
-#### STEP 1:
 1) Launch VPC with Public and Private Subnets.
 2) Use a NAT instance.
 3) Instance type = t2.micro
@@ -133,7 +132,6 @@ $ rs.status()
 
 ### Task 3 - Create AMI of the primary node
 
-#### STEPS:
 1) Select the primary instance -> Actions -> Image -> Create Image
 2) Name = MongoDB AMI
 
@@ -166,6 +164,45 @@ NOTE: We can only allocate a maximum of 5 elastic IPs. Hence, for the arbiter no
 
 ** Name the instance as MongoDB arbiter.
 
+## Week 3:
+Objective ---> Riak cluster setup.
+
+### Task 1 - Launching Riak Marketplace AMI (5 Nodes):
+1. AMI:             Riak KV 2.2 Series
+2. Instance Type:   t2.micro
+3. VPC:             cmpe281
+4. Network:         private subnet
+5. Auto Public IP:  no
+6. Security Group:  riak-cluster 
+7. SG Open Ports:   (see below)
+8. Key Pair:        cmpe281-us-west-1
+
+#### Security group setup:
+* Riak Cluster Security Group (Open Ports): 22(SSH), 8087 (Riak Protocol Buffers Interface), 8098 (Riak HTTP Interface).
+* In order to allow communication between the Riak instances, need to add additional rules within this security group.
+* The additional rules are - 4369, 6000-7999, 8099, 9080 (Set the source to the current security group).
+
+### Task 2 - Launching "Jump Box" AWS Linux AMI:
+1. AMI:             Amazon Linux AMI 2018.03.0 (HVM)
+2. Instance Type:   t2.micro
+3. VPC:             cmpe281
+4. Network:         public subnet
+5. Auto Public IP:  yes
+6. Security Group:  cmpe281-dmz 
+7. SG Open Ports:   22, 80, 443
+8. Key Pair:        cmpe281-us-west-1
+
+### Task 3 - SSH into Riak Instances (via Jump Box):
+1. SSH into the Jump Box.
+2. SSH into the Riak instance via the Jump Box. (Connecting to private instance from a public instance).
+
+### Task 4 - Setup Riak Cluster:
+1. sudo riak start (Run the command on all instances)
+2. sudo riak-admin cluster join riak@<ip.of.first.node> (Run the command in all the other instances)
+3. sudo riak-admin cluster plan 
+4. sudo riak-admin cluster status 
+5. sudo riak-admin cluster commit 
+6. sudo riak-admin member_status 
 
 
 
