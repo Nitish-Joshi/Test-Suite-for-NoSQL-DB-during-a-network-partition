@@ -167,6 +167,8 @@ NOTE: We can only allocate a maximum of 5 elastic IPs. Hence, for the arbiter no
 ## Week 3:
 Objective ---> Riak cluster setup.
 
+### PART I: CONFIGURING A RIAK CLUSTER ON AWS:
+
 ### Task 1 - Launching Riak Marketplace AMI (5 Nodes):
 1. AMI:             Riak KV 2.2 Series
 2. Instance Type:   t2.micro
@@ -197,12 +199,89 @@ Objective ---> Riak cluster setup.
 2. SSH into the Riak instance via the Jump Box. (Connecting to private instance from a public instance).
 
 ### Task 4 - Setup Riak Cluster:
-1. sudo riak start (Run the command on all instances)
-2. sudo riak-admin cluster join riak@<ip.of.first.node> (Run the command in all the other instances)
-3. sudo riak-admin cluster plan 
-4. sudo riak-admin cluster status 
-5. sudo riak-admin cluster commit 
-6. sudo riak-admin member_status 
 
+#### Start Riak on all Nodes:
+1. sudo riak start (Run the command on all instances)
+
+#### Join Riak from Other Nodes to the First Node:
+1. sudo riak-admin cluster join riak@<ip.of.first.node> (Run the command in all the other instances)
+
+#### Plan and Commit Changes:
+1. sudo riak-admin cluster plan 
+2. sudo riak-admin cluster commit 
+
+#### Check Status of the Cluster:
+1. sudo riak-admin member_status 
+2. sudo riak-admin cluster status 
+
+** The Riak cluster is now running on the AWS.
+
+### Task 5 - Create bucket-type in Riak:
+1. sudo riak-admin bucket-type create subjects 
+2. sudo riak-admin bucket-type activate subjects
+
+** Since all our 5 Riak Nodes are in the private subnet, we will need Kong in order to access those instances.
+
+### PART II: CONFIGURING KONG AND POSTMAN SETUP TO TEST RIAK AP PROPERTIES.
+
+### Task 6 - Installing Docker on Riak Jumpbox (AWS EC2 Instance) :
+1. sudo yum update -y
+2. sudo yum install -y docker
+3. sudo service docker start
+4. sudo usermod -a -G docker ec2-user
+
+### Task 7 -Setting up Kong on Docker:
+
+#### Create Network:
+sudo docker network create --driver bridge kong
+
+#### List of Networks:
+sudo docker network ls
+
+#### Run Kong Database:
+sudo docker run -d --name kong-database --network kong -p 9402:9402 cassandra:2.2
+
+#### Run kong:
+sudo docker run -d --name kong1 --network kong -e "KONG_DATABASE=cassandra" -e "KONG_CASSANDRA_CONTACT_POINTS=kong-db" -e "KONG_PG_HOST=kong-db" -p 8000:8000 -p 8443:8443 -p 8001:8001 -p 7946:7946 -p 7946:7946/udp kong:0.9.9
+
+#### Check running docker containers:
+sudo docker ps --all --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}\t"
+
+### Task 8 - Configure Kong setup via Postman:
+
+** Add a security group named "Kong" with open ports 8000 and 8001 to configure Kong (via Postman)
+
+#### Configure Kong Upstream URL for all the 5 Nodes.
+
+POST http://13.56.164.9:8001/apis   //IP address of Riak Jumpbox
+
+Body:
+
+{
+"name":"node1",
+"request_path": "/node1",
+"strip_request_path":"true",
+"preserve_host":"true",
+"upstream_url":"http://10.0.1.112:8098/"   // Private IP of the Instance
+}
+
+** Repeat the above steps for the remaining 4 nodes as well. (Replace the Private IP in the upstream URL)
+
+#### Ping all the 5 Nodes.
+GET http://13.56.164.9:8000/node1/ping 
+GET http://13.56.164.9:8000/node2/ping 
+GET http://13.56.164.9:8000/node3/ping 
+GET http://13.56.164.9:8000/node4/ping 
+GET http://13.56.164.9:8000/node5/ping 
+
+#### Check Bucket Properties:
+GET http://13.56.164.9:8000/node1/types/subjects/buckets/cmpe281/props
+
+#### Set Bucket Properties:
+PUT http://13.56.164.9:8000/node1/types/subjects/buckets/cmpe281/props
+
+Body: 
+
+{"props":{"allow_mult":false}}
 
 
