@@ -285,3 +285,14 @@ Body:
 {"props":{"allow_mult":false}}
 
 
+## Week 4:
+Objective ---> CRUD operations and GO API setup.
+
+### Task:
+
+1) Understand the GO API functionality.
+2) Initial setup to run goapi 
+3) Method for connecting mongodb using mgo
+5) Implementing basic CRUD operations for Mongodb in GO
+
+Kindly refer to the source code for CRUD API implementaion. 
