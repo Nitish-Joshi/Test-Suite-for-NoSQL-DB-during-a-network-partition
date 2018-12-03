@@ -26,9 +26,9 @@ Objective ---> Initial Research on the basic understanding and functionality of 
 * Studying other related terminologies required for the project.
 
 **What is CAP Theorem?**  
-ANS: States that it is impossible for a distributed data store to simultaneously provide more than two of the following three guarantees:-
-1.CONSISTENCY - Every read receives the most recent write or an error.
-2.AVAILIBILITY - Every request receives a response that is not an error.
+ANS: States that it is impossible for a distributed data store to simultaneously provide more than two of the following three guarantees:-  
+1.CONSISTENCY - Every read receives the most recent write or an error.  
+2.AVAILIBILITY - Every request receives a response that is not an error.  
 3.PARTITION TOLERANCE - The system continues to operate despite an arbitrary number of messages being dropped (or delayed) by the network between nodes. 
 
 **What are the requirements of the project that have been understood from the project?**  
@@ -55,7 +55,7 @@ Objective ---> MongoDB cluster setup with replicaset configuration.
 8) Security group: MongoDB (open ports = 22, 27017)
 9) Key-value pair: cmpe281
 
-* SSH into the MongoDB jumpbox using the keyValue pair. 
+* SSH into the MongoDB jumpbox using the keyValue pair.   
 (Use Putty for Windows - a free SSH client for Windows platform) 
 
 ### Task 2 - Install MongoDB:
@@ -165,12 +165,11 @@ $ sudo service mongod status
 ** To begin with, one primary and two secondary nodes will be in N. California Region and the other two secondary nodes will be in the Oregon region.
 ** SSH into the primary instance via the MongoDB jumpbox.
 
-* Connecting to private instance from a public instance:
----------------------------------------------------------
---> SSH into the Public instance (jumpbox in this case).
---> Get .pem file into the root folder from local. (Use Winscp for windows).
---> Make sure private instance has port 22 opened.
---> sudo ssh -i cmpe281.pem ec2-user@<private-ip of the instance>
+* Connecting to private instance from a public instance:  
+--> SSH into the Public instance (jumpbox in this case).  
+--> Get .pem file into the root folder from local. (Use Winscp for windows).  
+--> Make sure private instance has port 22 opened.  
+--> sudo ssh -i cmpe281.pem ec2-user@<private-ip of the instance>  
 
 ### Task 10 - Initialize the replica set:
 
@@ -270,19 +269,19 @@ Objective ---> Riak cluster setup.
 ### Task 7 -Setting up Kong on Docker:
 
 #### Create Network:
-sudo docker network create --driver bridge kong
+$ sudo docker network create --driver bridge kong
 
 #### List of Networks:
-sudo docker network ls
+$ sudo docker network ls
 
 #### Run Kong Database:
-sudo docker run -d --name kong-database --network kong -p 9402:9402 cassandra:2.2
+$ sudo docker run -d --name kong-database --network kong -p 9402:9402 cassandra:2.2
 
 #### Run kong:
-sudo docker run -d --name kong1 --network kong -e "KONG_DATABASE=cassandra" -e "KONG_CASSANDRA_CONTACT_POINTS=kong-db" -e "KONG_PG_HOST=kong-db" -p 8000:8000 -p 8443:8443 -p 8001:8001 -p 7946:7946 -p 7946:7946/udp kong:0.9.9
+$ sudo docker run -d --name kong1 --network kong -e "KONG_DATABASE=cassandra" -e "KONG_CASSANDRA_CONTACT_POINTS=kong-db" -e "KONG_PG_HOST=kong-db" -p 8000:8000 -p 8443:8443 -p 8001:8001 -p 7946:7946 -p 7946:7946/udp kong:0.9.9
 
 #### Check running docker containers:
-sudo docker ps --all --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}\t"
+$ sudo docker ps --all --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}\t"
 
 ### Task 8 - Configure Kong setup via Postman:
 
@@ -292,24 +291,24 @@ sudo docker ps --all --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}
 
 POST http://13.56.164.9:8001/apis   //IP address of Riak Jumpbox
 
-Body:
+Body:  
 
 {
-"name":"node1",
-"request_path": "/node1",
-"strip_request_path":"true",
-"preserve_host":"true",
-"upstream_url":"http://10.0.1.112:8098/"   // Private IP of the Instance
+"name":"node1",  
+"request_path": "/node1",  
+"strip_request_path":"true",  
+"preserve_host":"true",  
+"upstream_url":"http://10.0.1.112:8098/"   // Private IP of the Instance  
 }
 
 ** Repeat the above steps for the remaining 4 nodes as well. (Replace the Private IP in the upstream URL)
 
 #### Ping all the 5 Nodes.
-GET http://13.56.164.9:8000/node1/ping 
-GET http://13.56.164.9:8000/node2/ping 
-GET http://13.56.164.9:8000/node3/ping 
-GET http://13.56.164.9:8000/node4/ping 
-GET http://13.56.164.9:8000/node5/ping 
+GET http://13.56.164.9:8000/node1/ping   
+GET http://13.56.164.9:8000/node2/ping   
+GET http://13.56.164.9:8000/node3/ping   
+GET http://13.56.164.9:8000/node4/ping   
+GET http://13.56.164.9:8000/node5/ping   
 
 #### Check Bucket Properties:
 GET http://13.56.164.9:8000/node1/types/subjects/buckets/cmpe281/props
