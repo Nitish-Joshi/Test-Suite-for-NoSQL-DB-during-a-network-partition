@@ -132,9 +132,7 @@ $ sudo service mongod status
 2) Name = MongoDB AMI  
 
 * We will be setting up the MongoDB cluster in two regions, N. California and Oregon.
-* The MongoDB instances will communicate with each other using VPC Peering technique.
-
-* VPC Peering
+* The MongoDB instances will communicate with each other using the [VPC Peering](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/VPC%20peering.md) technique.
 
 ### Task 9 - Create the MongoDB instances:
 
