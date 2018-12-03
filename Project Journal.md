@@ -43,126 +43,163 @@ Ans: MongoDB is easy to scale. Supports replication and high availability. Use i
 ## Week 2:
 Objective ---> MongoDB cluster setup with replicaset configuration.
 
-### Task 1 - Configure VPC:
+### Task 1 - Create a MongoDB jumpbox:
 
-1) Launch VPC with Public and Private Subnets.
-2) Use a NAT instance.
-3) Instance type = t2.micro
-
-### Task 2 - Configure and setup the primary instance of the MongoDB cluster:
-
-#### STEP 1: Creating a primary node.
-1) Select'Ubuntu Server 16.04 LTS (HVM)' type instance.
-2) Instance Type: t2.micro
-3) Number of instances: 1
-4) Subnet: Public
-5) Auto-assign Public IP: Disable 
-6) Security group: MongoDB (open ports = 22, 27017)
-7) Key-value pair: cmpe281
-
-#### STEP 2: Allocate a new elastic IP to the primary instance.
-
-#### STEP 3: SSH into the primary instance.
-1) SSH into the above primary node using the keyValue pair.
-(Use Putty for Windows - a free SSH client for Windows platform)
-
-#### STEP 4: Installing MongoDB on the primary node.
-1) sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
-2) echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
-3) sudo apt-get update
-4) sudo apt-get install -y mongodb-org
-
-#### STEP 5: Creating a key file that will be used to secure authentication between the members of the replica set.
-1) Command to generate the key file:
-  $ openssl rand -base64 741 > keyFile
-2) Create the /opt/mongo directory to store the key file:
-  $ sudo mkdir -p /opt/mongodb
-3) Move the keyfile to /opt/mongo, and assign it the correct permissions:
-  $ sudo cp keyFile /opt/mongodb
-4) Update the ownership of the file.
-  $ sudo chown mongodb:mongodb /opt/mongodb/keyFile
-  $ sudo chmod 0600 /opt/mongodb/keyFile
-  
-#### STEP 6: Config mongod.conf
-$ sudo nano /etc/mongod.conf
-
-1)  remove or comment out bindIp: 127.0.0.1
-    replace with bindIp: 0.0.0.0 (binds on all ips)
-    
-    (network interfaces)
-    net:
-        port: 27017
-        bindIp: 0.0.0.0
-
-2) Uncomment security section & add key file
-    
-    security:
-      keyFile: /opt/mongodb/keyFile
-
-3) Uncomment Replication section. Name Replica Set = cmpe281
-     
-     replication:
-        replSetName: cmpe281
-        
-#### STEP 7: Creating mongod.service   
-$ sudo nano /etc/systemd/system/mongod.service
-
-[Unit]
-    Description=High-performance, schema-free document-oriented database
-    After=network.target
-
-[Service]
-    User=mongodb
-    ExecStart=/usr/bin/mongod --quiet --config /etc/mongod.conf
-
-[Install]
-    WantedBy=multi-user.target
-    
-#### STEP 8: Enabling Mongo Service
-$ sudo systemctl enable mongod.service
-
-#### STEP 9: Restart MongoDB to apply the changes
-$ sudo service mongod restart
-$ sudo service mongod status
-
-#### STEP 10: Initialize the replica set
-$ mongo
-$ rs.initiate()
-$ rs.status()
-
-### Task 3 - Create AMI of the primary node
-
-1) Select the primary instance -> Actions -> Image -> Create Image
-2) Name = MongoDB AMI
-
-### Task 4 - Configure the replicaset (secondary and arbiter nodes) from the AMI
-
-#### STEP 1: Creating the secondary nodes.
-1) My AMIs: 'MongoDB AMI'
-2) Instance Type: t2.micro
-3) Number of instances: 3
-4) Subnet: Public subnet
-5) Auto-assign Public IP: Disable 
-6) Security Group: MongoDB (22, 27017)
-
-** Name the instances as MongoDB primary, MongoDB secondary1, MongoDB secondary2, MongoDB secondary3
-
-#### STEP 2: Assign elastic IP to secondary nodes.
-
-NOTE: We can only allocate a maximum of 5 elastic IPs. Hence, for the arbiter node, we need to auto-assign the public IP as we have allocated the 5 elastic IPs to the primary node, 3 secondary nodes and the NAT instance.
-
-#### STEP 3: Creating the aribiter node.
 1) Launch instance
-2) My AMIs: 'MongoDB AMI'
+2) Select'Amazon Linux AMI' type instance.
 3) Instance Type: t2.micro
 4) Number of instances: 1
-5) Network: VPC cmpe281
-6) Subnet: Public subnet
+5) Network: VPC cmpe281 (N.California Region)
+6) Subnet: Public
 7) Auto-assign Public IP: Enable 
+8) Security group: MongoDB (open ports = 22, 27017)
+9) Key-value pair: cmpe281
+
+* SSH into the MongoDB jumpbox using the keyValue pair. 
+(Use Putty for Windows - a free SSH client for Windows platform) 
+
+### Task 2 - Install MongoDB:
+
+1) sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4  
+2) echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
+3) sudo apt-get update  
+4) sudo apt-get install -y mongodb-org  
+
+### Task 3 - Create a key file to secure authentication between the members of your replica set:
+
+1) Generate your key file:   
+$ openssl rand -base64 741 > keyFile  
+
+2) Create and store your key file in the /opt/mongo directory:  
+$ sudo mkdir -p /opt/mongodb  
+
+3) Move the keyfile to /opt/mongo, and assign it the correct permissions:  
+$ sudo cp keyFile /opt/mongodb  
+
+4) Update the file ownership.  
+$ sudo chown mongodb:mongodb /opt/mongodb/keyFile  
+$ sudo chmod 0600 /opt/mongodb/keyFile  
+
+### Task 4 - Config mongod.conf:
+
+$ sudo nano /etc/mongod.conf  
+
+1)  remove or comment out bindIp: 127.0.0.1  
+    replace with bindIp: 0.0.0.0 (binds on all ips)  
+
+    (network interfaces)  
+    net:  
+        port: 27017  
+        bindIp: 0.0.0.0  
+
+2) Uncomment security section & add key file  
+
+    security:  
+      keyFile: /opt/mongodb/keyFile  
+
+3) Uncomment Replication section. Name Replica Set = cmpe281
+
+    replication:  
+        replSetName: cmpe281  
+        
+### Task 5 - Create mongod.service:
+
+$ sudo nano /etc/systemd/system/mongod.service  
+
+[Unit]  
+    Description=High-performance, schema-free document-oriented database  
+    After=network.target  
+
+[Service]  
+    User=mongodb  
+    ExecStart=/usr/bin/mongod --quiet --config /etc/mongod.conf  
+
+[Install]  
+    WantedBy=multi-user.target  
+    
+### Task 6 - Enable Mongo Service:  
+
+$ sudo systemctl enable mongod.service  
+
+### Task 7 - Restart MongoDB to apply our changes:  
+
+$ sudo service mongod restart  
+$ sudo service mongod status  
+
+### Task 8 - Create AMI of the instance with MongoDB installed:
+
+1) Select the primary instance -> Actions -> Image -> Create Image  
+2) Name = MongoDB AMI  
+
+* We will be setting up the MongoDB cluster in two regions, N. California and Oregon.
+* The MongoDB instances will communicate with each other using VPC Peering technique.
+
+* VPC Peering
+
+### Task 9 - Create the MongoDB instances:
+
+#### Subtask 1 - Instances in N. California Region.
+
+1) Launch Instance 'Ubuntu Server 16.04 LTS (HVM)' type.
+2) My AMIs: 'MongoDB AMI'
+3) Instance Type: t2.micro
+4) Number of instances: 3
+5) Network: VPC cmpe281
+6) Subnet: Private
+7) Auto-assign Public IP: Disable 
 8) Security Group: MongoDB (22, 27017)
 9) Key-value pair: cmpe281
 
-** Name the instance as MongoDB arbiter.
+#### Subtask 2 - Instances in Oregon Region.
+
+1) Launch Instance 'Ubuntu Server 16.04 LTS (HVM)' type.
+2) My AMIs: 'MongoDB AMI'
+3) Instance Type: t2.micro
+4) Number of instances: 2
+5) Network: VPC cmpe281-oregon
+6) Subnet: Private
+7) Auto-assign Public IP: Disable 
+8) Security Group: MongoDB (22, 27017)
+9) Key-value pair: cmpe281-oregon
+
+** To begin with, one primary and two secondary nodes will be in N. California Region and the other two secondary nodes will be in the Oregon region.
+** SSH into the primary instance via the MongoDB jumpbox.
+
+* Connecting to private instance from a public instance:
+---------------------------------------------------------
+--> SSH into the Public instance (jumpbox in this case).
+--> Get .pem file into the root folder from local. (Use Winscp for windows).
+--> Make sure private instance has port 22 opened.
+--> sudo ssh -i cmpe281.pem ec2-user@<private-ip of the instance>
+
+### Task 10 - Initialize the replica set:
+
+$ mongo  
+$ rs.initiate()  
+$ rs.status()  
+
+### Task 11 - Create administrator account on the primary instance:
+
+$ mongo  
+$ use admin  
+$ db.createUser( {   
+  user: "admin",  
+  pwd: "cmpe281",  
+  roles: [{ role: "root", db: "admin" }]   
+});  
+
+### Task 12 - Initiate replication and add secondary nodes to the replica set:
+
+$ mongo  
+$ use admin  
+$ db.auth("admin","cmpe281")    
+$ rs.initiate()  
+$ rs.add("10.0.1.9") // secondary1  
+$ rs.add("10.0.1.84") // secondary2  
+$ rs.add("11.0.1.237") // secondary3  
+$ rs.add("11.0.1.54") // secondary4  
+
+$ rs.status()  
 
 ## Week 3:
 Objective ---> Riak cluster setup.
