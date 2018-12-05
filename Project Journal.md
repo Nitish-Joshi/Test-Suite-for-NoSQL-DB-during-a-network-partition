@@ -330,3 +330,10 @@ Objective ---> CRUD operations and GO API setup.
 5) Implementing basic CRUD operations for Mongodb in GO
 
 Kindly refer to the source code for CRUD API implementaion. 
+
+## Week 5: 
+Objective ---> Testing the CP and AP properties and recording a video for the same.
+
+### Task 1: Testing the network partition in MongoDB cluster.
+
+### Task 2: Testing the network partition in Riak cluster.
