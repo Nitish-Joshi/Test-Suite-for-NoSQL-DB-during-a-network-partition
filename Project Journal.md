@@ -131,8 +131,8 @@ $ sudo service mongod status
 1) Select the primary instance -> Actions -> Image -> Create Image  
 2) Name = MongoDB AMI  
 
-* We will be setting up the MongoDB cluster in two regions, N. California and Oregon.
-* The MongoDB instances will communicate with each other using the [VPC Peering](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/VPC%20peering.md) technique.
+* We will be setting up the MongoDB cluster in three regions, N. California, Oregon and Ohio.
+* These MongoDB instances will communicate with each other using the [VPC Peering](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/VPC%20peering.md) technique.
 
 ### Task 9 - Create the MongoDB instances:
 
@@ -160,7 +160,20 @@ $ sudo service mongod status
 8) Security Group: MongoDB (22, 27017)
 9) Key-value pair: cmpe281-oregon
 
-** To begin with, one primary and two secondary nodes will be in N. California Region and the other two secondary nodes will be in the Oregon region.
+#### Subtask 3 - Instance in Ohio Region.
+
+1) Launch Instance 'Ubuntu Server 16.04 LTS (HVM)' type.
+2) My AMIs: 'MongoDB AMI'
+3) Instance Type: t2.micro
+4) Number of instances: 1
+5) Network: VPC cmpe281-ohio
+6) Subnet: Private
+7) Auto-assign Public IP: Disable 
+8) Security Group: MongoDB (22, 27017)
+9) Key-value pair: cmpe281-ohio
+
+** To begin with, one primary and two secondary nodes will be in N. California Region tow other secondary nodes will be in the Oregon region and one secondary node in the Ohio region.  
+
 ** SSH into the primary instance via the MongoDB jumpbox.
 
 * Connecting to private instance from a public instance:  
@@ -195,8 +208,9 @@ $ rs.add("10.0.1.9") // secondary1
 $ rs.add("10.0.1.84") // secondary2  
 $ rs.add("11.0.1.237") // secondary3  
 $ rs.add("11.0.1.54") // secondary4  
+$ rs.add("12.0.2.171") // secondary5
 
-$ rs.status()  
+$ rs.status()    
 
 ## Week 3:
 Objective ---> Riak cluster setup.
@@ -335,5 +349,50 @@ Kindly refer to the source code for CRUD API implementaion.
 Objective ---> Testing the CP and AP properties and recording a video for the same.
 
 ### Task 1: Testing the network partition in MongoDB cluster.
+
+$ rs.slaveOk() // on all secondary nodes
+
+#### TEST CASE 1: Replication Testing.
+
+* Enter some dummy data on the primary and check if that data is replicated on the secondary nodes in all the three regions.
+
+$ use teams  
+$ db.users.save( {username:"Nitish"} )  
+$ db.users.find()  
+
+<b>EXPECTED OUTPUT</b> - Should be able to read data inserted in primary on all the secondaries.  
+<b>ACTUAL OUTPUT</b>- Updated data being read on all secondaries.  
+$ Test passed.  
+
+#### TEST CASE 2: Reading the Updated Data.  
+
+* Create a network partition between the primary instance and any one of the other secondary instances.
+* In order to achieve this, we can delete the VPC peering connection or just delete the CIDR block of the other VPC from the route table between two regions (eg: California and Ohio in this case).
+
+<b>EXPECTED OUTPUT</b> - Should be able to read updated data.     
+<b>ACTUAL OUTPUT</b>- Updated data is being read.    
+$ Test passed.
+
+#### TEST CASE 3: Reading the Stale Data. 
+
+* Create a network partition between the seondary node from Ohio and both other regions i.e. Oregon and California.
+* In this way, we are isolating the secondary instance in Ohio completely.
+* To achieve this, we can delete the CIDR blocks of both the regions (Oregon and N. California) from the Ohio route tables and also delete the CIDR block of the Ohio region from the route tables of Oregon and N. California regions respectively.  
+
+<b>EXPECTED OUTPUT</b> - Should be able to read stale data.   
+<b>ACTUAL OUTPUT</b>- Stale data is being read.  
+$ Test passed.
+
+** Add the CIDR blocks back to the route tables of the VPCs, thus enabling communication between them.
+
+#### TEST CASE 4: Leader Election Testing. 
+
+* Step down the primary for 12 seconds using the command:  
+$ rs.stepDown(12);
+
+<b>EXPECTED OUTPUT</b> - Should elect new leader after primary is down.  
+<b>ACTUAL OUTPUT</b>- New leader elected after primary went down.  
+$ Test passed.
+
 
 ### Task 2: Testing the network partition in Riak cluster.
