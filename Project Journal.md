@@ -27,9 +27,9 @@ Objective ---> Initial Research on the basic understanding and functionality of 
 
 **What is CAP Theorem?**  
 ANS: States that it is impossible for a distributed data store to simultaneously provide more than two of the following three guarantees:-  
-1.CONSISTENCY - Every read receives the most recent write or an error.  
-2.AVAILIBILITY - Every request receives a response that is not an error.  
-3.PARTITION TOLERANCE - The system continues to operate despite an arbitrary number of messages being dropped (or delayed) by the network between nodes. 
+1. CONSISTENCY - Every read receives the most recent write or an error.  
+2. AVAILIBILITY - Every request receives a response that is not an error.  
+3. PARTITION TOLERANCE - The system continues to operate despite an arbitrary number of messages being dropped (or delayed) by the network between nodes. 
 
 **What are the requirements of the project that have been understood from the project?**  
 ANS: We are supposed to create a cluster of NoSQL DBS wherein if one of the system is not able to communicate with the rest of the systems due to network failure then also our API should be able to read stale data. Thus showing high availability of our cluster (partition tolerant system).
@@ -361,7 +361,7 @@ $ db.users.save( {username:"Nitish"} )
 $ db.users.find()  
 
 <b>EXPECTED OUTPUT</b> - Should be able to read data inserted in primary on all the secondaries.  
-<b>ACTUAL OUTPUT</b>- Updated data being read on all secondaries.  
+<b>ACTUAL OUTPUT</b>- Able to read data on all secondaries.  
 $ Test passed.  
 
 #### TEST CASE 2: Reading the Updated Data.  
@@ -396,3 +396,138 @@ $ Test passed.
 
 
 ### Task 2: Testing the network partition in Riak cluster.
+
+* Testing done via Postman.  
+
+#### TEST CASE 1: REPLICATION TESTING.
+
+<b>Create Node1 Key:</b>  
+
+POST http://13.56.164.9:8000/node1/types/teams/buckets/epl/keys/liverpool
+
+Body:   
+{Manager: "Jurgen Klopp"}
+
+<b>Check for Replication:</b>  
+
+GET http://13.56.164.9:8000/node1/types/teams/buckets/epl/keys/liverpool  
+GET http://13.56.164.9:8000/node2/types/teams/buckets/epl/keys/liverpool  
+GET http://13.56.164.9:8000/node3/types/teams/buckets/epl/keys/liverpool  
+GET http://13.56.164.9:8000/node4/types/teams/buckets/epl/keys/liverpool  
+GET http://13.56.164.9:8000/node5/types/teams/buckets/epl/keys/liverpool  
+
+<b>EXPECTED OUTPUT</b> - Should be able to read data inserted in node1 on all the other nodes.   
+<b>ACTUAL OUTPUT</b>- Able to read data on all the other nodes.    
+$ Test passed. 
+
+
+#### TEST CASE 2: REPLICATION TESTING AFTER CREATING NETWORK PARTITION.
+
+* Create Network Partition:  
+
+<b>Block Nodes 1,2 and 3 on Node 4 and 5 with iptables command and vice-versa</b>    
+
+$ sudo iptables -I INPUT -s 10.0.1.112 -j DROP  
+$ sudo iptables -I INPUT -s 10.0.1.186 -j DROP  
+$ sudo iptables -I INPUT -s 10.0.1.71 -j DROP  
+
+$ sudo iptables -I INPUT -s 10.0.1.79 -j DROP   
+$ sudo iptables -I INPUT -s 10.0.1.133 -j DROP  
+
+<b>Create new Node1 Key:</b>  
+
+POST http://13.56.164.9:8000/node1/types/teams/buckets/epl/keys/arsenal
+
+Body: 
+{Manager: "Unai Emery"}
+
+<b>Check for Replication:</b>
+
+GET http://13.56.164.9:8000/node1/types/teams/buckets/epl/keys/arsenal  
+GET http://13.56.164.9:8000/node2/types/teams/buckets/epl/keys/arsenal  
+GET http://13.56.164.9:8000/node3/types/teams/buckets/epl/keys/arsenal  
+GET http://13.56.164.9:8000/node4/types/teams/buckets/epl/keys/arsenal  
+GET http://13.56.164.9:8000/node5/types/teams/buckets/epl/keys/arsenal  
+
+<b>EXPECTED OUTPUT</b> - Should be not be able to read data inserted in node1 on partitioned nodes 4 and 5.   
+<b>ACTUAL OUTPUT</b>- Not able to read data on nodes 4 and 5. Able to read data only on nodes 1, 2 and 3.  
+$ Test passed. 
+
+
+#### TEST CASE 3: REPLICATION TESTING AFTER UNBLOCKING THE TRAFFIC ON ALL THE NODES.
+
+- update data from node 1  
+- unblock traffic  
+- read data from all nodes  
+
+* Delete Network Partition:
+
+<b>Unblock the traffic from Nodes 1,2, and 3 and vice-versa.</b>
+
+$ sudo iptables -D INPUT -s 10.0.1.112 -j DROP  
+$ sudo iptables -D INPUT -s 10.0.1.186 -j DROP  
+$ sudo iptables -D INPUT -s 10.0.1.71 -j DROP  
+
+$ sudo iptables -D INPUT -s 10.0.1.79 -j DROP  
+$ sudo iptables -D INPUT -s 10.0.1.133 -j DROP  
+
+<b>Create new Node1 Key:</b>  
+
+POST http://13.56.164.9:8000/node1/types/teams/buckets/epl/keys/mancity  
+
+Body:   
+{Manager: "Pep Guardiola"}  
+
+<b>Check for Replication:</b>  
+
+GET http://13.56.164.9:8000/node1/types/teams/buckets/epl/keys/mancity  
+GET http://13.56.164.9:8000/node2/types/teams/buckets/epl/keys/mancity  
+GET http://13.56.164.9:8000/node3/types/teams/buckets/epl/keys/mancity  
+GET http://13.56.164.9:8000/node4/types/teams/buckets/epl/keys/mancity  
+GET http://13.56.164.9:8000/node5/types/teams/buckets/epl/keys/mancity  
+
+<b>EXPECTED OUTPUT</b> - Should be able to read the updated data inserted in node1 on nodes 4 and 5 after removing the partition.   
+<b>ACTUAL OUTPUT</b>- Able to read data on nodes 4 and 5 after removing the partition.  
+$ Test passed. 
+
+
+** Timestamp based resolution --> the value that is written later, will be kept.  
+
+#### TEST CASE 4: TESTING DATA FOR TIMESTAMP BASED RESOLUTION OVER CONFLICTS.
+
+- update with different data on two different nodes, say 1 and 4 for the same key, say tottenham.  
+- update on 1 first.    
+- update on 4 later.    
+- read data for all nodes to see which data is fetched.  
+
+<b>Create new Node1 Key:</b>  
+
+POST http://13.56.164.9:8000/node1/types/teams/buckets/epl/keys/tottenham  
+
+Body:  
+{Manager: "Mario Pocchetino"}  
+
+<b>Create new Node4 Key:</b>  
+
+POST http://13.56.164.9:8000/node4/types/teams/buckets/epl/keys/tottenham
+
+Body: 
+{Captain: "Harry Kane"}
+
+<b>Check for Replication:</b>
+
+GET http://13.56.164.9:8000/node1/types/teams/buckets/epl/keys/tottenham  
+GET http://13.56.164.9:8000/node2/types/teams/buckets/epl/keys/tottenham  
+GET http://13.56.164.9:8000/node3/types/teams/buckets/epl/keys/tottenham  
+GET http://13.56.164.9:8000/node4/types/teams/buckets/epl/keys/tottenham  
+GET http://13.56.164.9:8000/node5/types/teams/buckets/epl/keys/tottenham  
+
+
+<b>EXPECTED OUTPUT</b> - Should be able to read the latest data inserted.  
+<b>ACTUAL OUTPUT</b>- Able to read only the latest data on all the nodes.    
+$ Test passed. 
+
+
+
+
+
