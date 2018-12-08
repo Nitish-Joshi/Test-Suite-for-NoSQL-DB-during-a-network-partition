@@ -2,7 +2,7 @@
 
 In this project, you will be testing the Partition Tolerance of a NoSQL DB using the procedures described in the following article: https://www.infoq.com/articles/jepsen. In addition, you will be developing a Data Service API in Go and deploying the API on AWS.
 
-# Requirements:
+### Requirements:
 * Select one CP and one AP NoSQL Database.
 * For example: Mongo and Riak (Note: Other NoSQL DBs that can be configured in CP or AP mode are also allowed).
 * For each Database:
@@ -27,12 +27,12 @@ Objective ---> Initial Research on the basic understanding and functionality of 
 
 **What is CAP Theorem?**  
 ANS: States that it is impossible for a distributed data store to simultaneously provide more than two of the following three guarantees:-  
-1. CONSISTENCY - Every read receives the most recent write or an error.  
-2. AVAILIBILITY - Every request receives a response that is not an error.  
-3. PARTITION TOLERANCE - The system continues to operate despite an arbitrary number of messages being dropped (or delayed) by the network between nodes. 
+1. <b>Consistency</b> - Every read receives the most recent write or an error.  
+2. <b>Availability</b> - Every request receives a response that is not an error.  
+3. <b>Partition Tolerance</b> - The system continues to operate despite an arbitrary number of messages being dropped (or delayed) by the network between nodes. 
 
 **What are the requirements of the project that have been understood from the project?**  
-ANS: We are supposed to create a cluster of NoSQL DBS wherein if one of the system is not able to communicate with the rest of the systems due to network failure then also our API should be able to read stale data. Thus showing high availability of our cluster (partition tolerant system).
+Ans: We are supposed to create a cluster of NoSQL DBS wherein if one of the system is not able to communicate with the rest of the systems due to network failure then also our API should be able to read stale data. Thus showing high availability of our cluster (partition tolerant system).
 
 **What is partition tolerance and its pitfalls?**  
 Ans: Partition tolerance in CAP means tolerance to a network partition. An example of NP is when two nodes cant talk to each other, but there are clients who are able to talk to either one of both of these nodes. An AP system is able to function during the network split, while being able to provide various forms of eventual consistency.
@@ -69,13 +69,10 @@ Objective ---> MongoDB cluster setup with replicaset configuration.
 
 1) Generate your key file:   
 $ openssl rand -base64 741 > keyFile  
-
 2) Create and store your key file in the /opt/mongo directory:  
 $ sudo mkdir -p /opt/mongodb  
-
 3) Move the keyfile to /opt/mongo, and assign it the correct permissions:  
 $ sudo cp keyFile /opt/mongodb  
-
 4) Update the file ownership.  
 $ sudo chown mongodb:mongodb /opt/mongodb/keyFile  
 $ sudo chmod 0600 /opt/mongodb/keyFile  
@@ -85,22 +82,9 @@ $ sudo chmod 0600 /opt/mongodb/keyFile
 $ sudo nano /etc/mongod.conf  
 
 1)  remove or comment out bindIp: 127.0.0.1  
-    replace with bindIp: 0.0.0.0 (binds on all ips)  
-
-    (network interfaces)  
-    net:  
-        port: 27017  
-        bindIp: 0.0.0.0  
-
-2) Uncomment security section & add key file  
-
-    security:  
-      keyFile: /opt/mongodb/keyFile  
-
-3) Uncomment Replication section. Name Replica Set = cmpe281
-
-    replication:  
-        replSetName: cmpe281  
+    replace with bindIp: 0.0.0.0 (binds on all ips)
+2) Uncomment security section & add keyFile: /opt/mongodb/keyFile  
+3) Uncomment replication section. Name Replica Set = cmpe281 
         
 ### Task 5 - Create mongod.service:
 
@@ -109,11 +93,9 @@ $ sudo nano /etc/systemd/system/mongod.service
 [Unit]  
     Description=High-performance, schema-free document-oriented database  
     After=network.target  
-
 [Service]  
     User=mongodb  
     ExecStart=/usr/bin/mongod --quiet --config /etc/mongod.conf  
-
 [Install]  
     WantedBy=multi-user.target  
     
@@ -172,15 +154,13 @@ $ sudo service mongod status
 8) Security Group: MongoDB (22, 27017)
 9) Key-value pair: cmpe281-ohio
 
-** To begin with, one primary and two secondary nodes will be in N. California Region tow other secondary nodes will be in the Oregon region and one secondary node in the Ohio region.  
-
-** SSH into the primary instance via the MongoDB jumpbox.
-
-* Connecting to private instance from a public instance:  
---> SSH into the Public instance (jumpbox in this case).  
---> Get .pem file into the root folder from local. (Use Winscp for windows).  
---> Make sure private instance has port 22 opened.  
---> sudo ssh -i cmpe281.pem ec2-user@<private-ip of the instance>  
+* To begin with, one primary and two secondary nodes will be in N. California Region tow other secondary nodes will be in the Oregon region and one secondary node in the Ohio region.  
+* SSH into the primary instance via the MongoDB jumpbox.  
+* Connecting to private instance from a public instance:
+1) SSH into the Public instance (jumpbox in this case).  
+2) Get .pem file into the root folder from local. (Use Winscp for windows).  
+3) Make sure private instance has port 22 opened.  
+4) sudo ssh -i cmpe281.pem ec2-user@<private-ip of the instance>  
 
 ### Task 10 - Initialize the replica set:
 
@@ -262,13 +242,13 @@ Objective ---> Riak cluster setup.
 1. sudo riak-admin member_status 
 2. sudo riak-admin cluster status 
 
-** The Riak cluster is now running on the AWS.
+* The Riak cluster is now running on the AWS.
 
 ### Task 5 - Create bucket-type in Riak:
 1. sudo riak-admin bucket-type create subjects 
 2. sudo riak-admin bucket-type activate subjects
 
-** Since all our 5 Riak Nodes are in the private subnet, we will need Kong in order to access those instances.
+* Since all our 5 Riak Nodes are in the private subnet, we will need Kong in order to access those instances.
 
 ### PART II: CONFIGURING KONG AND POSTMAN SETUP TO TEST RIAK AP PROPERTIES.
 
@@ -297,7 +277,7 @@ $ sudo docker ps --all --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Statu
 
 ### Task 8 - Configure Kong setup via Postman:
 
-** Add a security group named "Kong" with open ports 8000 and 8001 to configure Kong (via Postman)
+* Add a security group named "Kong" with open ports 8000 and 8001 to configure Kong (via Postman)
 
 #### Configure Kong Upstream URL for all the 5 Nodes.
 
@@ -491,7 +471,7 @@ GET http://13.56.164.9:8000/node5/types/teams/buckets/epl/keys/mancity
 $ Test passed. 
 
 
-** Timestamp based resolution --> the value that is written later, will be kept.  
+* Timestamp based resolution --> the value that is written later, will be kept.  
 
 #### TEST CASE 4: TESTING DATA FOR TIMESTAMP BASED RESOLUTION OVER CONFLICTS.
 
