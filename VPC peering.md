@@ -26,6 +26,32 @@
 14) Once your VPC peering connection is active, you must add an entry to your VPC route tables to enable traffic to be directed between the peered VPCs.    
 15) Edit route the route tables by adding the CIDR of the other VPC.
 
+### Peering Connections:
+
+#### N.California:  
+
+![Peering Connection](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/Wow/Peering%20connections.png)  
+
+#### Oregon:  
+
+![Peering Connection](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/Wow/Peering%20connections%20in%20Oregon.png)  
+
+#### Ohio:  
+
+![Peering Connection](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/Wow/Peering%20connections%20in%20Ohio.png)  
+
+#### California & Ohio:
+
+![Cal & Ohio](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/Wow/Peering%20connections%20-%20California%20%26%20Ohio.png)  
+
+#### California & Oregon:
+
+![Cal & Oregon](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/Wow/Peering%20connections%20-%20California%20%26%20Oregon.png)  
+
+### Routing Tables:
+
+![Routing Tables](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/Wow/Peering%20connections%20-%20Route%20Table%20of%20California.png)  
+
 ## Copy AMI from one region to another:
 
 * Since we will be creating the MongoDB cluster between two regions, we will need the MongoDB installed AMI in both the regions. The steps to copy the AMI are given below.
