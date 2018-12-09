@@ -1,12 +1,12 @@
 # MongoDB Sharding: Research, Setup and Configurations.
 
 ## Research & Architecture:  
-* <b>Mongod</b> - A daemon program which runs quietly in background on your machine. Responsible for handling data requests, managing data access, and other background operations.
-*<b>Mongo</b> - A default command line client or interface for MongoDB.
-*<b>Mongos</b> - Mongos runs on the application server and play a role of query router for sharded clusters.
+* <b>Mongod</b> - A daemon program which runs quietly in background on your machine. Responsible for handling data requests, managing data access, and other background operations.  
+* <b>Mongo</b> - A default command line client or interface for MongoDB.  
+* <b>Mongos</b> - Mongos runs on the application server and play a role of query router for sharded clusters.  
 
-* Main objective of Sharding in MongoDB is scalibility. 
-* MongoDB supports horizontal scalability which can be achieved with the help of Sharding. 
+* Main objective of Sharding in MongoDB is scalibility.   
+* MongoDB supports horizontal scalability which can be achieved with the help of Sharding.   
 
 ### What is Sharding?  
 * Sharding is a method for distributing data across multiple machines.   
@@ -36,54 +36,51 @@
 
 ## SHARDING STRATEGIES:
 
-1) Hash Based Strategy: 
-- Colelction data is partitioned into chunks and then based on the hashed shard key values, each chunk is then assigned a range.
+1) Hash Based Strategy: Colelction data is partitioned into chunks and then based on the hashed shard key values, each chunk is then assigned a range.
 
-2) Range Sharding:
-- Collection data is divided into ranges [min,max] determined by the shard key. 
+2) Range Sharding: Collection data is divided into ranges [min,max] determined by the shard key. 
 
 ### MongoDB default ports:
 
-Server/Service         Port Number
-___________________________________
-
-Mongod & Mongos          27017
-Shard Server             27018
-Config Server 			     27019
+|Server/Service|Port Number|
+|--------------|-----------|
+|Mongod, Mongos|   27017   |
+|Shard Server  |   27018   |
+|Config Server |   27019   |
 
 ## SETUP:
 
 ### Security Groups:
 
-1. mongodb-internal-access 
-Port Range = 27017-27019
-Source = Custom - sg
+1. mongodb-internal-access   
+Port Range = 27017-27019  
+Source = Custom - sg  
 
-2. mongodb-external-access
-Port = 27017
-Source = 0.0.0.0/0
+2. mongodb-external-access  
+Port = 27017  
+Source = 0.0.0.0/0  
 
 ### Create config-server-1:
 
-Launch Instance       :'Amazon Linux AMI' type.
-Instance Type         : t2.micro
-Number of instances   : 1
-Network               : VPC cmpe281-oregon
-Subnet                : Public
-Auto-assign Public IP : Enable
-Security Group        : mongodb-internal-access
-Key-value pair        : cmpe281-oregon
+Launch Instance       :'Amazon Linux AMI' type.  
+Instance Type         : t2.micro  
+Number of instances   : 1  
+Network               : VPC cmpe281-oregon  
+Subnet                : Public  
+Auto-assign Public IP : Enable  
+Security Group        : mongodb-internal-access  
+Key-value pair        : cmpe281-oregon  
 
-* For the installation of MongoDB on the AWS server, we first need to configure the package management system (yum).
+* For the installation of MongoDB on the AWS server, we first need to configure the package management system (yum).  
 
 $ sudo nano /etc/yum.repos.d/mongodb-org-3.4.repo
 
-[mongodb-org-3.4]
-name=MongoDB Repository
-baseurl=https://repo.mongodb.org/yum/amazon/2013.03/mongodb-org/3.4/x86_64/
-gpgcheck=1
-enabled=1
-gpgkey=https://www.mongodb.org/static/pgp/server-3.4.asc
+[mongodb-org-3.4]  
+name=MongoDB Repository  
+baseurl=https://repo.mongodb.org/yum/amazon/2013.03/mongodb-org/3.4/x86_64/  
+gpgcheck=1  
+enabled=1  
+gpgkey=https://www.mongodb.org/static/pgp/server-3.4.asc  
 
 $ sudo yum update -y  
 $ sudo yum install -y mongodb-org-3.4.10
@@ -126,18 +123,18 @@ $ sudo lsof -iTCP -sTCP:LISTEN | grep mongo
 
 $ mongo -port 27019
 
-## To deploy our config-servers as a replica set, we have to initiate the replica set here, using the rs.initiate()
+#### To deploy our config-servers as a replica set, we have to initiate the replica set here, using the rs.initiate()
 
-rs.initiate(
-{
-	_id:"crs",
-	configsvr: true,
+rs.initiate(  
+{  
+	_id:"crs",  
+	configsvr: true,  
 	members:[
         {_id : 0, host : "private-ip:27019"},
         {_id : 1, host : "private-ip:27019"}
-	]
-}
-)
+	]  
+}  
+)  
 
 ### Setup 4 Shard Servers:
 
@@ -162,27 +159,27 @@ $ mongo -port 27018
 
 #### To deploy our shard-servers as a replica set, we have to initiate the replica set here, using the rs.initiate()
 
-rs.initiate(
-{
-	_id:"rs0",
-	shardsvr: true,
+rs.initiate(  
+{  
+	_id:"rs0",  
+	shardsvr: true,  
 	members:[
         {_id : 0, host : "private-ip:27019"},
         {_id : 1, host : "private-ip:27019"}
-	]
-}
-)
+	]  
+}  
+)  
 
-rs.initiate(
-{
-	_id:"rs1",
-	shardsvr: true,
+rs.initiate(  
+{  
+	_id:"rs1",  
+	shardsvr: true,  
 	members:[
         {_id : 0, host : "private-ip:27019"},
         {_id : 1, host : "private-ip:27019"}
-	]
-}
-)
+	]  
+}  
+)  
 
 ### Setup Mongos:
 
@@ -210,6 +207,6 @@ $ use laliga
 $ db.bios.getShardDistribution()
 
 #### Check for sharded data on shard servers:
-$ db.bios.count()
+$ db.bios.count()  
 $ db.bios.find().pretty()
 
