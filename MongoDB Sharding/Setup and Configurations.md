@@ -50,6 +50,12 @@
 
 ## SETUP:
 
+![Configurations](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/Sharding%20SS/Sharding%20Setup%20on%20AWS.png)  
+
+![SG1](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/Sharding%20SS/Sharding%20security%20group%20configuration.png)  
+
+![SG2](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/Sharding%20SS/Sharding%20security%20group%20configuration%20-%20part2.png)  
+
 ### Security Groups:
 
 1. mongodb-internal-access   
