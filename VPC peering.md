@@ -1,5 +1,7 @@
 ## What is VPC peering?
 
+![VPC Peering](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/VPC%20Peering.png)  
+
 1) Amazon VPC (Virtual Private Cloud) enables you to launch AWS resources into a virtual network that you've defined.
 2) A VPC peering connection is a networking connection between two VPCs that enables you to route traffic between them using private IPv4 addresses or IPv6 addresses.
 3) Instances in either VPC can communicate with each other as if they are within the same network.
