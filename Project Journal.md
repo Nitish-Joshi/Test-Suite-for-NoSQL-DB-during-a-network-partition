@@ -130,6 +130,8 @@ $ sudo service mongod status
 8) Security Group: MongoDB (22, 27017)
 9) Key-value pair: cmpe281
 
+![N.California Setup](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/MongoDB%20SS/Mongo%20Instances%20in%20N.%20California.png)
+
 #### Subtask 2 - Instances in Oregon Region.
 
 1) Launch Instance 'Ubuntu Server 16.04 LTS (HVM)' type.
@@ -140,7 +142,9 @@ $ sudo service mongod status
 6) Subnet: Private
 7) Auto-assign Public IP: Disable 
 8) Security Group: MongoDB (22, 27017)
-9) Key-value pair: cmpe281-oregon
+9) Key-value pair: cmpe281-oregon  
+
+![Oregon Setup](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/MongoDB%20SS/Mongo%20Instances%20in%20Oregon.png)
 
 #### Subtask 3 - Instance in Ohio Region.
 
@@ -153,6 +157,8 @@ $ sudo service mongod status
 7) Auto-assign Public IP: Disable 
 8) Security Group: MongoDB (22, 27017)
 9) Key-value pair: cmpe281-ohio
+
+![Ohio Setup](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/MongoDB%20SS/Mongo%20Instance%20in%20Ohio.png)
 
 * To begin with, one primary and two secondary nodes will be in N. California Region tow other secondary nodes will be in the Oregon region and one secondary node in the Ohio region.  
 * SSH into the primary instance via the MongoDB jumpbox.  
@@ -207,10 +213,14 @@ Objective ---> Riak cluster setup.
 7. SG Open Ports:   (see below)
 8. Key Pair:        cmpe281-us-west-1
 
+![Riak Cluster Setup](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/Riak%20SS/Riak%20Cluster%20configuration%20in%20AWS.png)  
+
 #### Security group setup:
 * Riak Cluster Security Group (Open Ports): 22(SSH), 8087 (Riak Protocol Buffers Interface), 8098 (Riak HTTP Interface).
 * In order to allow communication between the Riak instances, need to add additional rules within this security group.
 * The additional rules are - 4369, 6000-7999, 8099, 9080 (Set the source to the current security group).
+
+![Riak Security Groups](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/Riak%20SS/Riak%20Cluster%20Security%20Groups.png)  
 
 ### Task 2 - Launching "Jump Box" AWS Linux AMI:
 1. AMI:             Amazon Linux AMI 2018.03.0 (HVM)
@@ -281,17 +291,7 @@ $ sudo docker ps --all --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Statu
 
 #### Configure Kong Upstream URL for all the 5 Nodes.
 
-POST http://13.56.164.9:8001/apis   //IP address of Riak Jumpbox
-
-Body:  
-
-{
-"name":"node1",  
-"request_path": "/node1",  
-"strip_request_path":"true",  
-"preserve_host":"true",  
-"upstream_url":"http://10.0.1.112:8098/"   // Private IP of the Instance  
-}
+![Kong Setup](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/Riak%20SS/Kong%20Setup.png)  
 
 ** Repeat the above steps for the remaining 4 nodes as well. (Replace the Private IP in the upstream URL)
 
@@ -302,16 +302,14 @@ GET http://13.56.164.9:8000/node3/ping
 GET http://13.56.164.9:8000/node4/ping   
 GET http://13.56.164.9:8000/node5/ping   
 
+![Ping](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/Riak%20SS/Ping%20Riak%20Nodes.png)  
+
 #### Check Bucket Properties:
 GET http://13.56.164.9:8000/node1/types/subjects/buckets/cmpe281/props
 
 #### Set Bucket Properties:
-PUT http://13.56.164.9:8000/node1/types/subjects/buckets/cmpe281/props
 
-Body: 
-
-{"props":{"allow_mult":false}}
-
+![Set Bucket Props](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/Riak%20SS/Set%20Bucket%20Properties.png) 
 
 ## Week 4:
 Objective ---> CRUD operations and GO API setup.
@@ -371,7 +369,7 @@ $ Test passed.
 $ rs.stepDown(12);
 
 <b>EXPECTED OUTPUT</b> - Should elect new leader after primary is down.  
-<b>ACTUAL OUTPUT</b>- New leader elected after primary went down.  
+<b>ACTUAL OUTPUT</b> - New leader elected after primary went down.  
 $ Test passed.
 
 
@@ -382,6 +380,8 @@ $ Test passed.
 #### TEST CASE 1: REPLICATION TESTING.
 
 <b>Create Node1 Key:</b>  
+
+![Create Node1 key](https://github.com/nguyensjsu/cmpe281-Nitish-Joshi/blob/master/Screenshots/Riak%20SS/Create%20Node1%20key.png)  
 
 POST http://13.56.164.9:8000/node1/types/teams/buckets/epl/keys/liverpool
 
